@@ -1,0 +1,23 @@
+{
+  "name": "homebridge-light-iotas",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [
+    "homebridge-plugin"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.2.0"
+  },
+  "author": "steve sample <steve@iotashome.com>",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "request": "^2.88.0",
+    "url": "^0.11.0"
+  }
+}
