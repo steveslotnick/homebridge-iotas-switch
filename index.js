@@ -3,6 +3,9 @@ const request = require('request');
 const url = require('url');
 const axios = require('axios');
 
+const token = "Bearer eyJhbGciOiJFUzI1NiJ9.eyJpYXQiOjE1MzYzNjU3MDQsInN1YiI6IjU5IiwiZXhwIjoxNTM2MzY2NjA0fQ.s0EIPins02-wAtehALzBT9JFcWBedB66h0h30EutNXsiugijZUb185cfhpFkVBN3JoxohZaBWo9ehcESqJYgOw";
+const featureId = "16185";
+
 module.exports = function (homebridge) {
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
@@ -17,7 +20,6 @@ mySwitch.prototype = {
       .setCharacteristic(Characteristic.Manufacturer, "My switch manufacturer")
       .setCharacteristic(Characteristic.Model, "My switch model")
       .setCharacteristic(Characteristic.SerialNumber, "123-456-789");
-      // .setCharacteristic(Characteristic.DisplayName, "MyCoolSwitch");;
  
     let switchService = new Service.Switch("My switch");
     switchService
@@ -31,7 +33,7 @@ mySwitch.prototype = {
   },
 
   getSwitchOnCharacteristic: function (next) {
-    // const me = this;
+    const me = this;
     // request({
     //     url: me.getUrl,
     //     method: 'GET',
@@ -45,15 +47,24 @@ mySwitch.prototype = {
     //   return next(null, body.currentState);
     // });
     console.log("query state");
-    return next(null, 0);
+    // console.log("me.featureId: ");
+    // console.log(me.featureId);
+    getFeature(me.iotasUrl, featureId).then((res) => {
+      let value = res.value === 1;
+      console.log('returning a value of: ' + value + ' for feature state');
+      return next(null, value);
+    }).catch((err) => {
+      me.log('error turning on');
+      me.log(err);
+      return next(err);
+    });
   },
    
   setSwitchOnCharacteristic: function (on, next) {
     const me = this;
-    me.log('value: ' + on);
+    me.log('setting switch value to: ' + on);
     let value = on ? 1 : 0;
-    me.log("turning on");
-    updateFeature(value).then((res) => {
+    updateFeature(me.baseUrl, value, featureId).then((res) => {
       return next();
     }).catch((err) => {
       me.log('error turning on');
@@ -65,23 +76,36 @@ mySwitch.prototype = {
  
 function mySwitch(log, config) {
   this.log = log;
-  this.getUrl = url.parse(config['getUrl']);
-  this.postUrl = url.parse(config['postUrl']);
+  // this.iotasUrl = url.parse(config['iotasUrl']);
 }
 
-function updateFeature(value) {
+function updateFeature(iotasUrl, value, featureId) {
   let body = {
     value: value
   }
   let config = {
     baseURL: "https://staging-api.iotashome.com/v1/api",
     headers: {
-      Authorization: "Bearer eyJhbGciOiJFUzI1NiJ9.eyJpYXQiOjE1MzYzNjMwOTYsInN1YiI6IjU5IiwiZXhwIjoxNTM2MzYzOTk2fQ.lUZVtexqa80vcj3Wk8T9QeJhu5Rdr2KzSvCFNolZ14HdYJjxQ__g0h2qOZEZIQK8ob4ufv-1ftT9YgdeZtj2EA"
+      Authorization: token
     }
   }
-  return axios.put(`/feature/16185`, body, config).then((response) => {
+  return axios.put(`/feature/${featureId}`, body, config).then((response) => {
     return response.data;
   }).catch((error) => {
-    processError('updateFeature()', error);
+    console.log('error: ' + error);
+  });
+}
+
+function getFeature(iotasUrl, featureId) {
+  return axios.get(`/feature/${featureId}`, {
+    baseURL: "https://staging-api.iotashome.com/v1/api",
+    headers: {
+      Authorization: token
+    }
+  }).then((response) => {
+    console.log('successful get of feature state');
+    return response.data;
+  }).catch((error) => {
+    console.log('error: ' + error);
   });
 }
