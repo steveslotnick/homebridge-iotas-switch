@@ -1,6 +1,5 @@
-const request = require('request');
-const url = require('url');
 const axios = require('axios');
+const jwt_decode = require('jwt-decode');
 
 var Service, Characteristic;
 
@@ -18,8 +17,8 @@ iotasSwitch.prototype = {
     
     let informationService = new Service.AccessoryInformation();
     informationService
-      .setCharacteristic(Characteristic.Manufacturer, "My switch manufacturer")
-      .setCharacteristic(Characteristic.Model, "My switch model")
+      .setCharacteristic(Characteristic.Manufacturer, "IOTAS")
+      .setCharacteristic(Characteristic.Model, "switch")
       .setCharacteristic(Characteristic.SerialNumber, "123-456-789");
  
     let switchService = new Service.Switch(self.accessoryName);
@@ -48,28 +47,39 @@ iotasSwitch.prototype = {
     const self = this;
     console.log("request to query state");
 
-    getFeature(self.iotasUrl, self.token, self.featureId).then((res) => {
-      let value = res.value === 1;
-      console.log('returning a value of: ' + value + ' for feature state');
-      return next(null, value);
-    }).catch((err) => {
-      self.log('error turning on');
-      self.log(err);
-      return next(err);
-    });
+    checkToken(self.iotasUrl, self.token, self.refreshToken, self.username).then((token) => {
+      self.token = token; //update token incase it was refreshed
+      getFeature(self.iotasUrl, token, self.featureId).then((res) => {
+        let value = res.value === 1;
+        console.log('returning a value of: ' + value + ' for feature state');
+        return next(null, value);
+      }).catch((err) => {
+        self.log('error turning on');
+        self.log(err);
+        return next(err);
+      });
+    }).catch((error) => {
+      console.log('could not refresh access token');
+    })
   },
    
   setSwitchOnCharacteristic: function (on, next) {
     const self = this;
     self.log('setting switch value to: ' + on);
     let value = on ? 1 : 0;
-    updateFeature(self.iotasUrl, self.token, value, self.featureId).then((res) => {
-      return next();
-    }).catch((err) => {
-      self.log('error turning on');
-      self.log(err);
-      return next(err);
+    checkToken(self.iotasUrl, self.token, self.refreshToken, self.username).then((token) => {
+      self.token = token; //update token incase it was refreshed
+      updateFeature(self.iotasUrl, token, value, self.featureId).then((res) => {
+        return next();
+      }).catch((err) => {
+        self.log('error turning on');
+        self.log(err);
+        return next(err);
+      });
+    }).catch((error) => {
+      console.log('could not refresh access token');
     });
+    
   }
 };
  
@@ -123,8 +133,33 @@ function authenticate(iotasUrl, username, password) {
     }
   }
   return axios.post(`/auth/tokenwithrefresh`, {}, config).then((response) => {
-    console.log('authentication response');
-    console.log(response);
+    return response.data;
+  }).catch((error) => {
+    console.log('error: ');
+    console.log(error);
+  });
+}
+
+function checkToken(iotasUrl, token, refreshToken, email) {
+  let decoded = jwt_decode(token);
+  let oneMinuteFromNow = (Date.now() + 1000*60) / 1000;
+  if(decoded.exp < oneMinuteFromNow) {
+    return refreshAccessToken(iotasUrl, refreshToken, email);
+  } else {
+    return Promise.resolve(token);
+  }
+}
+
+function refreshAccessToken(iotasUrl, refreshToken, email) {
+  let config = {
+    baseURL: iotasUrl,
+  }
+
+  let body = {
+    refresh: refreshToken,
+    email: email
+  }
+  return axios.post(`/auth/refresh`, body, config).then((response) => {
     return response.data;
   }).catch((error) => {
     console.log('error: ');

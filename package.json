@@ -1,7 +1,7 @@
 {
-  "name": "homebridge-light-iotas",
-  "version": "1.0.0",
-  "description": "",
+  "name": "homebridge-iotas-switch",
+  "version": "0.0.1",
+  "description": "A homebridge plugin to control an IOTAS switch",
   "main": "index.js",
   "keywords": [
     "homebridge-plugin"
@@ -17,7 +17,6 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.18.0",
-    "request": "^2.88.0",
-    "url": "^0.11.0"
+    "jwt-decode": "^2.2.0"
   }
 }
