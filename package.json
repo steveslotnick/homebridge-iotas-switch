@@ -18,5 +18,9 @@
   "dependencies": {
     "axios": "^0.18.0",
     "jwt-decode": "^2.2.0"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/IOTASHome/homebridge-iotas-switch"
   }
 }
