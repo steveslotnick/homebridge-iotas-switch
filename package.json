@@ -1,6 +1,6 @@
 {
   "name": "homebridge-iotas-switch",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A homebridge plugin to control an IOTAS switch",
   "main": "index.js",
   "keywords": [
@@ -20,7 +20,7 @@
     "jwt-decode": "^2.2.0"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/IOTASHome/homebridge-iotas-switch"
+    "type": "git",
+    "url": "https://github.com/IOTASHome/homebridge-iotas-switch"
   }
 }
