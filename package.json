@@ -1,6 +1,6 @@
 {
   "name": "homebridge-iotas-switch",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A homebridge plugin to control an IOTAS switch",
   "main": "index.js",
   "keywords": [
