@@ -1,5 +1,4 @@
 # homebridge-iotas-switch
-
 IOTAS Home plugin for the [Homebridge](https://github.com/nfarina/homebridge) project.
 
 ## Currently supports
@@ -7,13 +6,11 @@ IOTAS Home plugin for the [Homebridge](https://github.com/nfarina/homebridge) pr
 - Outlet
 
 # Installation
-
 1. Install homebridge using: `npm install -g homebridge`
 2. Install this plugin using: `npm install -g homebridge-iotas-switch`
 3. Update your configuration file. See the sample below.
 
 # Configuration
-
 Configuration sample:
 
  ```javascript
@@ -28,3 +25,6 @@ Configuration sample:
         }
     ]
 ```
+
+# License
+See LICENSE file

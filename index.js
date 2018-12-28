@@ -6,7 +6,7 @@ var Service, Characteristic;
 module.exports = function (homebridge) {
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
-  homebridge.registerAccessory("homebridge-light-iotas", "IotasSwitch", iotasSwitch);
+  homebridge.registerAccessory("homebridge-iotas-switch", "IotasSwitch", iotasSwitch);
 };
 
 iotasSwitch.prototype = {
